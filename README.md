@@ -4,67 +4,86 @@ A mobile-friendly web companion to the [Group Works card deck](https://groupwork
 
 Used with permission.
 
-## Features
+## What it does
 
-- **Browse** all 91 patterns by category or A–Z, with search
-- **Draw** a random card, optionally filtered by category
-- **Spreads** — tarot-style layouts (2–7 cards, or custom up to 13) for designing or debriefing gatherings
-- Category divider cards with official descriptions
-- Related pattern chips on each card detail view
+- Browse all 91 patterns by category or A–Z, with search
+- Draw a random card, optionally filtered by category
+- Lay spreads (like tarot) to design or debrief a gathering
 - Links through to the full pattern on groupworksdeck.org
+
+---
+
+## Setup
+
+### Step 1 — Get the files
+
+Download or clone this repo:
+
+```
+https://github.com/miltonics/groupworks-web-app
+```
+
+### Step 2 — Get the card images
+
+1. Go to [groupworksdeck.org](https://groupworksdeck.org) and download the free PDF
+2. The file will be named **GroupWorks-Deck-2019-Download-4up.pdf**
+3. Put the PDF in the same folder as `extract_cards.py`
+
+### Step 3 — Install Python dependencies
+
+```powershell
+pip install pymupdf pillow
+```
+
+### Step 4 — Extract the card images
+
+```powershell
+python extract_cards.py "GroupWorks-Deck-2019-Download-4up.pdf"
+```
+
+This creates a `cards\` folder with all 91 card images plus the 9 category cards, correctly named. Takes about a minute.
+
+### Step 5 — Deploy
+
+Upload these two things to your web server in the same folder:
+
+```
+groupworks.html
+cards\
+```
+
+That's it. Open `groupworks.html` in a browser to verify everything looks right before uploading.
+
+---
+
+## Optional: fetch official card text
+
+The app ships with plain-language summaries for each card. To replace them with the official "Heart" text from groupworksdeck.org:
+
+```powershell
+pip install requests beautifulsoup4
+python fetch_hearts.py
+```
+
+Run this from the same folder as `groupworks.html`. It visits each pattern page, scrapes the official text, and patches it into the HTML file. Takes about 3 minutes. A backup is saved as `groupworks.html.bak`.
+
+---
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `groupworks.html` | The single-file web app — host this on your server |
-| `fetch_hearts.py` | Scrapes official heart text + related cards from groupworksdeck.org and patches them into `groupworks.html` |
-| `extract_cards.py` | Splits the Group Works PDF into per-card images |
-| `convert_to_jpg.py` | Converts extracted PNG card images to JPGs |
-| `fix_page22.py` | Fixes cards that came from the wrong PDF page during extraction |
-| `card_filenames.txt` | Checklist of all 91 expected image filenames |
+| `groupworks.html` | The web app — this is what you host |
+| `extract_cards.py` | Extracts card images from the PDF |
+| `fetch_hearts.py` | Fetches official card text from groupworksdeck.org |
+| `convert_tiles.py` | Alternative: converts PNGs to JPGs if you have them already |
+| `card_filenames.txt` | Reference list of all 91 expected image filenames |
 
-## Setup
-
-### 1. Get the card images
-
-Request the free PDF download at [groupworksdeck.org](https://groupworksdeck.org), then:
-
-```bash
-pip install pymupdf pillow
-python extract_cards.py GroupWorks.pdf
-python convert_to_jpg.py
-```
-
-This creates a `cards/` folder with 91 JPGs. Upload that folder alongside `groupworks.html` on your server.
-
-### 2. Fetch official card text and related patterns
-
-```bash
-pip install requests beautifulsoup4
-python fetch_hearts.py
-```
-
-Run from the same folder as `groupworks.html`. It visits each pattern page on groupworksdeck.org, scrapes the Heart text and related pattern list, and patches them directly into `groupworks.html`. Takes ~3 minutes. A backup is saved to `groupworks.html.bak`.
-
-### 3. Deploy
-
-Upload to your server:
-
-```
-your-site/groupworks/
-  groupworks.html
-  cards/
-    aesthetics_of_space.jpg
-    ... (91 files)
-```
-
-## Card image filenames
-
-See `card_filenames.txt` for the full list of expected filenames. Images go in a `cards/` subfolder next to `groupworks.html`. Any card without a matching image falls back to a styled text face automatically.
+---
 
 ## Credits
 
-Card content © the Group Pattern Language Project, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).  
-Web app © 2025 miltonics, [MIT License](LICENSE).  
+Card content © the Group Pattern Language Project, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+Web app © 2025 miltonics, [MIT License](LICENSE).
 Built as an independent companion, used with permission. Not officially affiliated with groupworksdeck.org.
+
