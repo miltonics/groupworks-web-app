@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Group Works Deck</title>
 <meta name="description" content="Browse, draw, and lay spreads with the Group Works pattern card deck.">
+<!-- groupworks-web-app v1.3 2025-08-28 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -33,10 +34,7 @@ body{
 }
 h1,h2,h3{font-family:'Fraunces',Georgia,serif}
 
-header{text-align:center;padding:26px 16px 14px}
-header h1{font-size:clamp(26px,6vw,34px);font-weight:700}
-header h1 em{font-style:italic;color:var(--gold)}
-header p{font-size:13px;color:#bcd2c3;margin-top:4px;letter-spacing:.04em}
+header{text-align:center;padding:26px 16px 14px;position:relative}
 
 nav{
   position:fixed;left:0;right:0;bottom:0;z-index:50;
@@ -55,7 +53,7 @@ nav button .ico{font-size:19px;line-height:1}
 nav button.on{color:var(--gold)}
 nav button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-main{max-width:680px;margin:0 auto;padding:0 14px}
+main{margin:0 auto;padding:0 14px}
 .view{display:none}
 .view.on{display:block;animation:rise .25s ease}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -134,10 +132,38 @@ main{max-width:680px;margin:0 auto;padding:0 14px}
 .relchip:hover{background:var(--cc,#888);color:#15110a}
 .relchip:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .count{font-size:12px;color:#9db8a6;margin:0 2px 10px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:11px;padding-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:11px;padding-bottom:24px}
 .mini{border:none;cursor:pointer;font-family:inherit;aspect-ratio:7/10;box-shadow:0 3px 10px rgba(0,0,0,.3)}
-.mini .desc{-webkit-line-clamp:5}
+.mini .desc{-webkit-line-clamp:7}
 .mini:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* ---------- gear button + dropdown ---------- */
+#gearbtn{
+  position:absolute;top:16px;right:16px;
+  background:none;border:none;color:rgba(247,240,225,.5);
+  font-size:22px;cursor:pointer;line-height:1;padding:4px;border-radius:8px;
+}
+#gearbtn:hover,#gearbtn.on{color:var(--gold)}
+#gearbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#dropdown{
+  display:none;position:absolute;top:60px;right:14px;z-index:80;
+  background:rgba(13,26,20,.98);backdrop-filter:blur(10px);
+  border:1px solid rgba(201,164,76,.4);border-radius:14px;
+  padding:14px 16px;min-width:260px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+}
+#dropdown.on{display:block}
+.drow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.drow:last-child{margin-bottom:0}
+.dlab{font-size:12.5px;font-weight:600;color:#bcd2c3;flex:0 0 auto}
+.dopts{display:flex;gap:6px}
+.dopt{
+  font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  border:1.5px solid rgba(247,240,225,.3);color:var(--stock);
+  background:transparent;border-radius:999px;padding:5px 10px;
+}
+.dopt.on{background:var(--gold);color:#241c08;border-color:var(--gold)}
+.dopt:focus-visible{outline:2px solid #fff;outline-offset:2px}
 
 /* ---------- detail modal ---------- */
 .modal{
@@ -147,7 +173,7 @@ main{max-width:680px;margin:0 auto;padding:0 14px}
   padding:18px 14px 40px;
 }
 .modal.on{display:flex}
-.sheet{width:100%;max-width:400px;margin-top:max(2vh,8px);position:relative}
+.sheet{width:100%;max-width:600px;margin-top:max(2vh,8px);position:relative}
 .sheet .x{
   position:absolute;top:-6px;right:-6px;z-index:5;
   width:36px;height:36px;border-radius:50%;border:2px solid var(--gold);cursor:pointer;
@@ -170,7 +196,7 @@ select{
   border:1px solid rgba(247,240,225,.3);border-radius:999px;padding:9px 14px;
 }
 select:focus{outline:2px solid var(--gold)}
-.flip{perspective:1100px;width:min(70vw,280px);aspect-ratio:7/10}
+.flip{perspective:1100px;width:min(80vw,320px);aspect-ratio:7/10}
 .flip .inner{
   position:relative;width:100%;height:100%;
   transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,.1,.2,1);
@@ -242,9 +268,32 @@ select:focus{outline:2px solid var(--gold)}
 <body>
 
 <header>
+  <button id="gearbtn" aria-label="Display settings">&#9881;</button>
   <h1>Group Works <em>Deck</em></h1>
   <p>A pattern language for bringing life to meetings &amp; gatherings</p>
 </header>
+
+<div id="dropdown" role="dialog" aria-label="Display settings">
+  <div class="drow">
+    <span class="dlab">Card size</span>
+    <div class="dopts" id="sizeOpts">
+      <button class="dopt" data-size="160">S</button>
+      <button class="dopt" data-size="240">M</button>
+      <button class="dopt on" data-size="320">L</button>
+      <button class="dopt" data-size="480">XL</button>
+    </div>
+  </div>
+  <div class="drow">
+    <span class="dlab">Columns</span>
+    <div class="dopts" id="colOpts">
+      <button class="dopt on" data-cols="auto">Auto</button>
+      <button class="dopt" data-cols="1">1</button>
+      <button class="dopt" data-cols="2">2</button>
+      <button class="dopt" data-cols="3">3</button>
+      <button class="dopt" data-cols="4">4</button>
+    </div>
+  </div>
+</div>
 
 <main>
 
@@ -323,6 +372,8 @@ select:focus{outline:2px solid var(--gold)}
   <button data-v="spread"><span class="ico">&#8983;</span>Spreads</button>
   <button data-v="about"><span class="ico">&#9783;</span>About</button>
 </nav>
+
+
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mtitle">
   <div class="sheet">
@@ -533,13 +584,73 @@ function fillFace(el, d){
 }
 
 /* ================= TABS ================= */
-document.querySelectorAll('nav button').forEach(b=>{
+document.querySelectorAll('nav button[data-v]').forEach(b=>{
   b.addEventListener('click',()=>{
-    document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('nav button[data-v]').forEach(x=>x.classList.toggle('on',x===b));
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
     $('v-'+b.dataset.v).classList.add('on');
     window.scrollTo({top:0});
   });
+});
+
+/* ================= SETTINGS ================= */
+let cardSize = 320;   // px — minmax value for grid
+let colMode  = 'auto'; // 'auto' | '1' | '2' | '3' | '4'
+
+function applyGrid(){
+  const cols = colMode === 'auto'
+    ? `repeat(auto-fill, minmax(${cardSize}px, 1fr))`
+    : `repeat(${colMode}, 1fr)`;
+  $('grid').style.gridTemplateColumns = cols;
+
+  // Draw card size
+  const drawPx = Math.min(cardSize, window.innerWidth * 0.85);
+  $('drawflip').style.width = drawPx + 'px';
+
+  // Spread table card size
+  const spreadMin = Math.min(cardSize, 320);
+  $('table').style.gridTemplateColumns =
+    colMode === 'auto'
+      ? `repeat(auto-fit, minmax(${spreadMin}px, 1fr))`
+      : `repeat(${colMode}, 1fr)`;
+
+  // persist
+  try { localStorage.setItem('gw_size', cardSize); localStorage.setItem('gw_cols', colMode); } catch(e){}
+}
+
+// Restore saved prefs
+try {
+  const s = localStorage.getItem('gw_size'); if(s) cardSize = +s;
+  const c = localStorage.getItem('gw_cols'); if(c) colMode = c;
+} catch(e){}
+
+// Sync button states on load
+function syncSettings(){
+  $('sizeOpts').querySelectorAll('.dopt').forEach(b=>
+    b.classList.toggle('on', +b.dataset.size === cardSize));
+  $('colOpts').querySelectorAll('.dopt').forEach(b=>
+    b.classList.toggle('on', b.dataset.cols === colMode));
+}
+syncSettings();
+
+$('sizeOpts').querySelectorAll('.dopt').forEach(b=>{
+  b.addEventListener('click',()=>{ cardSize=+b.dataset.size; syncSettings(); applyGrid(); });
+});
+$('colOpts').querySelectorAll('.dopt').forEach(b=>{
+  b.addEventListener('click',()=>{ colMode=b.dataset.cols; syncSettings(); applyGrid(); });
+});
+
+const dropdown = $('dropdown');
+$('gearbtn').addEventListener('click', e=>{
+  e.stopPropagation();
+  dropdown.classList.toggle('on');
+  $('gearbtn').classList.toggle('on', dropdown.classList.contains('on'));
+});
+document.addEventListener('click', e=>{
+  if(!dropdown.contains(e.target) && e.target !== $('gearbtn')){
+    dropdown.classList.remove('on');
+    $('gearbtn').classList.remove('on');
+  }
 });
 
 /* ================= BROWSE ================= */
@@ -582,6 +693,7 @@ function renderGrid(){
   $('count').textContent = list.length + ' patterns' +
     (activeCat>-1 ? ' \u00b7 ' + CATS[activeCat].n : '');
   const g=$('grid'); g.innerHTML='';
+  if(typeof applyGrid === 'function') applyGrid();
   if(activeCat>-1 && !q){
     const cat = CATS[activeCat];
     const b = document.createElement('button');
@@ -614,6 +726,7 @@ function renderGrid(){
   }
 }
 renderGrid();
+applyGrid();
 
 /* ================= DETAIL MODAL ================= */
 const NAME_LOOKUP = {};
