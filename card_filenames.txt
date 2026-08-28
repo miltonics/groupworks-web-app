@@ -1,0 +1,112 @@
+# Group Works — expected card image filenames
+# Place all 91 of these JPGs inside a  cards/  folder
+# next to groupworks.html
+
+# Intention (5)
+commitment.jpg
+invitation.jpg
+priority_focus.jpg
+purpose.jpg
+setting_intention.jpg
+
+# Context (8)
+aesthetics_of_space.jpg
+circle.jpg
+gaia.jpg
+group_culture.jpg
+history_and_context.jpg
+nooks_in_space_and_time.jpg
+power_of_place.jpg
+whole_system_in_the_room.jpg
+
+# Relationship (10)
+appreciation.jpg
+breaking_bread_together.jpg
+celebrate.jpg
+good_faith_assumptions.jpg
+honour_each_person.jpg
+hosting.jpg
+power_shift.jpg
+shared_airtime.jpg
+tend_relationships.jpg
+transparency.jpg
+
+# Flow (15)
+balance_process_and_content.jpg
+balance_structure_and_flexibility.jpg
+closing.jpg
+divergence_and_convergence_rhythm.jpg
+follow_the_energy.jpg
+iteration.jpg
+opening_and_welcome.jpg
+preparedness.jpg
+reflection_action_cycle.jpg
+rest.jpg
+right_size_bite.jpg
+ritual.jpg
+seasoned_timing.jpg
+subgroup_and_whole_group.jpg
+trajectory.jpg
+
+# Creativity (7)
+challenge.jpg
+expressive_arts.jpg
+generate_possibilities.jpg
+improvise.jpg
+mode_choice.jpg
+playfulness.jpg
+power_of_constraints.jpg
+
+# Perspective (10)
+common_ground.jpg
+embrace_dissonance_and_difference.jpg
+fractal.jpg
+go_meta.jpg
+seeing_the_forest_seeing_the_trees.jpg
+time_shift.jpg
+translation.jpg
+unity_and_diversity.jpg
+value_the_margins.jpg
+viewpoint_shift.jpg
+
+# Modelling (14)
+appropriate_boundaries.jpg
+courageous_modelling.jpg
+discharging.jpg
+dwell_with_emotions.jpg
+guerrilla_facilitation.jpg
+holding_space.jpg
+listening.jpg
+mirroring.jpg
+not_about_you.jpg
+self_awareness.jpg
+shared_leadership_and_roles.jpg
+simplify.jpg
+taking_responsibility.jpg
+witness_with_compassion.jpg
+
+# Inquiry & Synthesis (13)
+deliberate.jpg
+distilling.jpg
+experts_on_tap.jpg
+feedback.jpg
+go_deeper.jpg
+harvesting.jpg
+inform_the_group_mind.jpg
+inquiry.jpg
+mapping_and_measurement.jpg
+moving_toward_alignment.jpg
+naming.jpg
+story.jpg
+yes_and.jpg
+
+# Faith (9)
+all_grist_for_the_mill.jpg
+dive_in.jpg
+emergence.jpg
+letting_go.jpg
+magic.jpg
+presence.jpg
+silence.jpg
+spirit.jpg
+trust_the_wisdom_of_the_group.jpg

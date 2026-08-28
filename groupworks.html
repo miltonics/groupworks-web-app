@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Group Works Deck</title>
+<meta name="description" content="Browse, draw, and lay spreads with the Group Works pattern card deck.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --table:#1d3a2f;
+  --stock:#f7f0e1;
+  --stock-dim:#ece2cc;
+  --ink:#2b2417;
+  --ink-soft:#6b5f48;
+  --gold:#c9a44c;
+  --r:14px;
+  --shadow:0 6px 18px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{
+  min-height:100%;
+  font-family:'Public Sans',system-ui,sans-serif;
+  color:var(--stock);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(201,164,76,.10), transparent 60%),
+    radial-gradient(900px 500px at 50% 110%, rgba(0,0,0,.45), transparent 60%),
+    var(--table);
+  padding-bottom:calc(76px + env(safe-area-inset-bottom));
+}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif}
+
+header{text-align:center;padding:26px 16px 14px}
+header h1{font-size:clamp(26px,6vw,34px);font-weight:700}
+header h1 em{font-style:italic;color:var(--gold)}
+header p{font-size:13px;color:#bcd2c3;margin-top:4px;letter-spacing:.04em}
+
+nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  display:flex;justify-content:space-around;
+  background:rgba(13,26,20,.96);backdrop-filter:blur(8px);
+  border-top:1px solid rgba(201,164,76,.35);
+  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+}
+nav button{
+  flex:1;max-width:120px;background:none;border:none;color:#9db8a6;
+  font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.03em;
+  padding:8px 4px;cursor:pointer;border-radius:10px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+nav button .ico{font-size:19px;line-height:1}
+nav button.on{color:var(--gold)}
+nav button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+main{max-width:680px;margin:0 auto;padding:0 14px}
+.view{display:none}
+.view.on{display:block;animation:rise .25s ease}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.btn{
+  font-family:inherit;font-size:14px;font-weight:600;
+  background:var(--gold);color:#241c08;border:none;border-radius:999px;
+  padding:11px 20px;cursor:pointer;letter-spacing:.02em;
+}
+.btn.ghost{background:transparent;color:var(--stock);border:1px solid rgba(247,240,225,.4)}
+.btn.small{padding:7px 14px;font-size:13px}
+.btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.btn:active{transform:translateY(1px)}
+
+/* ---------- shared card face ---------- */
+.cardface{
+  position:relative;display:flex;flex-direction:column;
+  background:linear-gradient(170deg,var(--stock) 0%,var(--stock-dim) 100%);
+  color:var(--ink);border-radius:var(--r);overflow:hidden;
+  padding:13px 12px;text-align:left;
+}
+.cardface::before{
+  content:"";position:absolute;inset:5px;border:1px solid rgba(43,36,23,.18);
+  border-radius:calc(var(--r) - 5px);pointer-events:none;z-index:1;
+}
+.cardface .band{height:7px;border-radius:99px;background:var(--cc,#888);margin-bottom:9px;flex:none}
+.cardface .nm{font-family:'Fraunces',serif;font-weight:700;line-height:1.15;font-size:17px}
+.cardface .desc{
+  margin-top:7px;font-size:12px;line-height:1.45;color:#473d2a;
+  display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;
+}
+.cardface .ct{margin-top:auto;padding-top:8px;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft)}
+.cardface img.art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+
+/* ---------- browse ---------- */
+.searchrow{display:flex;gap:8px;margin:6px 0 12px}
+.searchrow input{
+  flex:1;font-family:inherit;font-size:15px;
+  background:rgba(0,0,0,.28);border:1px solid rgba(247,240,225,.25);
+  border-radius:999px;color:var(--stock);padding:10px 16px;
+}
+.searchrow input::placeholder{color:#9db8a6}
+.searchrow input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 10px}
+.chip{
+  flex:0 0 auto;font-family:inherit;font-size:12px;font-weight:600;
+  border:1.5px solid var(--cc,#888);color:var(--stock);
+  background:transparent;border-radius:999px;padding:5px 11px;cursor:pointer;
+  letter-spacing:.02em;
+}
+.chip.on{background:var(--cc,#888);color:#15110a}
+.chip:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.sortrow{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sortlab{font-size:12px;color:#9db8a6;font-weight:600;letter-spacing:.04em}
+.sortbtn{
+  font-family:inherit;font-size:12.5px;font-weight:600;
+  background:transparent;color:#9db8a6;border:1.5px solid rgba(247,240,225,.25);
+  border-radius:999px;padding:6px 13px;cursor:pointer;
+}
+.sortbtn.on{background:var(--gold);color:#241c08;border-color:var(--gold)}
+.sortbtn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.sechead{
+  grid-column:1/-1;font-family:'Fraunces',serif;font-size:15px;color:var(--gold);
+  border-bottom:1px solid rgba(201,164,76,.35);padding:14px 2px 6px;
+  margin-top:4px;letter-spacing:.02em;
+}
+.sechead:first-child{margin-top:0;padding-top:0}
+.relwrap{margin-top:14px;padding-top:12px;border-top:1px solid rgba(43,36,23,.15)}
+.relwrap h3{font-family:'Fraunces',serif;font-size:13px;color:var(--ink-soft);margin-bottom:8px;font-weight:600;letter-spacing:.02em}
+.relchips{display:flex;flex-wrap:wrap;gap:7px}
+.relchip{
+  font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;
+  border:1.5px solid var(--cc,#888);color:var(--ink);background:rgba(255,255,255,.4);
+  border-radius:999px;padding:6px 12px;
+}
+.relchip:hover{background:var(--cc,#888);color:#15110a}
+.relchip:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.count{font-size:12px;color:#9db8a6;margin:0 2px 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:11px;padding-bottom:24px}
+.mini{border:none;cursor:pointer;font-family:inherit;aspect-ratio:7/10;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.mini .desc{-webkit-line-clamp:5}
+.mini:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* ---------- detail modal ---------- */
+.modal{
+  position:fixed;inset:0;z-index:100;display:none;
+  background:rgba(10,20,15,.84);backdrop-filter:blur(4px);
+  align-items:flex-start;justify-content:center;overflow-y:auto;
+  padding:18px 14px 40px;
+}
+.modal.on{display:flex}
+.sheet{width:100%;max-width:400px;margin-top:max(2vh,8px);position:relative}
+.sheet .x{
+  position:absolute;top:-6px;right:-6px;z-index:5;
+  width:36px;height:36px;border-radius:50%;border:2px solid var(--gold);cursor:pointer;
+  background:#142b22;color:var(--stock);font-size:16px;line-height:1;
+}
+.bigcard{aspect-ratio:7/10;box-shadow:var(--shadow)}
+.bigcard .nm{font-size:clamp(21px,5.6vw,26px)}
+.bigcard .desc{font-size:clamp(13.5px,3.6vw,15.5px);line-height:1.55;-webkit-line-clamp:9}
+.bigcard .ct{font-size:11.5px}
+.sheet .links{margin-top:13px;display:flex;flex-direction:column;gap:9px}
+.sheet a.btn{display:block;text-align:center;text-decoration:none}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:10px}
+.pager .btn{flex:1;background:rgba(247,240,225,.12);color:var(--stock);border:1px solid rgba(247,240,225,.3)}
+
+/* ---------- draw ---------- */
+.drawwrap{display:flex;flex-direction:column;align-items:center;gap:18px;padding:8px 0 30px}
+select{
+  font-family:inherit;font-size:13.5px;font-weight:600;
+  background:rgba(0,0,0,.28);color:var(--stock);
+  border:1px solid rgba(247,240,225,.3);border-radius:999px;padding:9px 14px;
+}
+select:focus{outline:2px solid var(--gold)}
+.flip{perspective:1100px;width:min(70vw,280px);aspect-ratio:7/10}
+.flip .inner{
+  position:relative;width:100%;height:100%;
+  transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,.1,.2,1);
+}
+.flip.flipped .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r);box-shadow:var(--shadow)}
+.face.back{
+  background:
+    repeating-linear-gradient(45deg, rgba(201,164,76,.14) 0 2px, transparent 2px 14px),
+    radial-gradient(circle at 50% 50%, #2c5444 0%, #1b3a2e 70%);
+  border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+}
+.face.back .mark{
+  font-family:'Fraunces',serif;font-size:42px;color:var(--gold);
+  border:2px solid var(--gold);border-radius:50%;
+  width:84px;height:84px;display:flex;align-items:center;justify-content:center;
+}
+.face.front{transform:rotateY(180deg)}
+#drawfront .nm{font-size:21px}
+#drawfront .desc{font-size:13.5px;line-height:1.5;-webkit-line-clamp:8}
+.drawhint{font-size:13px;color:#9db8a6}
+
+/* ---------- spread ---------- */
+.spreadbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:4px 0 6px}
+.spreaddesc{text-align:center;font-size:13px;color:#bcd2c3;min-height:18px;margin-bottom:14px;padding:0 8px;line-height:1.5}
+.table{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+  gap:14px 10px;justify-items:center;padding:4px 0 18px;
+}
+.slot{display:flex;flex-direction:column;align-items:center;gap:7px;width:100%;max-width:200px}
+.slot .lab{font-family:'Fraunces',serif;font-size:13px;color:var(--gold);text-align:center;line-height:1.25;min-height:17px}
+.slot .flip{width:100%;cursor:pointer}
+.slot .nm{font-size:15px}
+.slot .desc{font-size:10.8px;line-height:1.4;-webkit-line-clamp:6}
+.slot .ct{font-size:9.5px}
+.slot .redo{
+  background:none;border:none;color:#9db8a6;font-family:inherit;
+  font-size:11.5px;font-weight:600;cursor:pointer;padding:3px 8px;border-radius:8px;
+}
+.slot .redo:focus-visible{outline:2px solid var(--gold)}
+.spreadactions{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;padding-bottom:26px}
+.toast{
+  position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(8px);
+  background:var(--gold);color:#241c08;font-size:13px;font-weight:600;
+  padding:9px 18px;border-radius:999px;opacity:0;pointer-events:none;
+  transition:.25s;z-index:200;box-shadow:var(--shadow);
+}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* ---------- about ---------- */
+.about{
+  background:rgba(0,0,0,.24);border:1px solid rgba(201,164,76,.3);
+  border-radius:16px;padding:20px 18px;margin-bottom:30px;line-height:1.65;font-size:14.5px;
+}
+.about h2{color:var(--gold);font-size:19px;margin:14px 0 6px}
+.about h2:first-child{margin-top:0}
+.about a{color:var(--gold)}
+.about code{background:rgba(0,0,0,.35);padding:1px 6px;border-radius:6px;font-size:13px}
+.about ul{padding-left:20px;margin:6px 0}
+.about li{margin:4px 0}
+
+@media (prefers-reduced-motion:reduce){
+  .flip .inner{transition:none}
+  .view.on{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Group Works <em>Deck</em></h1>
+  <p>A pattern language for bringing life to meetings &amp; gatherings</p>
+</header>
+
+<main>
+
+  <section id="v-browse" class="view on">
+    <div class="searchrow">
+      <input id="q" type="search" placeholder="Search the 91 patterns&#8230;" aria-label="Search patterns">
+    </div>
+    <div class="chips" id="chips" role="tablist" aria-label="Filter by category"></div>
+    <div class="sortrow" role="group" aria-label="Sort order">
+      <span class="sortlab">Sort:</span>
+      <button class="sortbtn on" id="sortcat">By category</button>
+      <button class="sortbtn" id="sortalpha">A&#8211;Z</button>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="v-draw" class="view">
+    <div class="drawwrap">
+      <select id="drawcat" aria-label="Draw from category">
+        <option value="-1">Any category</option>
+      </select>
+      <div class="flip" id="drawflip" role="button" tabindex="0" aria-label="Drawn card; tap to reveal">
+        <div class="inner">
+          <div class="face back"><div class="mark">GW</div></div>
+          <div class="face front cardface" id="drawfront"></div>
+        </div>
+      </div>
+      <p class="drawhint" id="drawhint">Tap the deck, or press Draw.</p>
+      <div style="display:flex;gap:10px">
+        <button class="btn" id="drawbtn">Draw a card</button>
+        <button class="btn ghost" id="drawopen" hidden>Full pattern</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-spread" class="view">
+    <div class="spreadbar" id="spreadbar"></div>
+    <div class="spreadbar" id="customrow" hidden>
+      <select id="customn" aria-label="Number of cards"></select>
+    </div>
+    <p class="spreaddesc" id="spreaddesc"></p>
+    <div class="spreadactions">
+      <button class="btn" id="dealbtn">Deal</button>
+      <button class="btn ghost" id="flipall">Reveal all</button>
+      <button class="btn ghost" id="copyspread">Copy as text</button>
+    </div>
+    <div class="table" id="table"></div>
+  </section>
+
+  <section id="v-about" class="view">
+    <div class="about">
+      <h2>About this app</h2>
+      <p>A pocket companion to the <strong>Group Works</strong> card deck — 91 patterns of healthy group process, created by the Group Pattern Language Project and shared under a Creative Commons BY&#8209;SA license. Browse the patterns, draw one at random for guidance, or lay a spread to design or debrief a gathering.</p>
+      <p style="margin-top:8px">The short text on each card here is an original plain-language summary written for this app — not the official card wording. Every card links to its full official pattern at <a href="https://groupworksdeck.org/patterns" target="_blank" rel="noopener">groupworksdeck.org</a>.</p>
+
+      <h2>Adding the card artwork</h2>
+      <p>To show the real card faces (which carry the official text), create a <code>cards/</code> folder next to this file and add a JPG per pattern, named with lowercase words joined by underscores:</p>
+      <ul>
+        <li><code>cards/aesthetics_of_space.jpg</code></li>
+        <li><code>cards/yes_and.jpg</code></li>
+        <li><code>cards/seeing_the_forest_seeing_the_trees.jpg</code></li>
+      </ul>
+      <p>When an image exists it replaces the text face automatically; any card without one keeps its summary face. The free deck download at groupworksdeck.org has the artwork.</p>
+
+      <h2>Credits</h2>
+      <p>Card content &copy; the Group Pattern Language Project, <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY&#8209;SA</a>. This viewer is an independent companion, used with permission.</p>
+    </div>
+  </section>
+
+</main>
+
+<nav aria-label="Main">
+  <button data-v="browse" class="on"><span class="ico">&#x1F0A0;</span>Browse</button>
+  <button data-v="draw"><span class="ico">&#10038;</span>Draw</button>
+  <button data-v="spread"><span class="ico">&#8983;</span>Spreads</button>
+  <button data-v="about"><span class="ico">&#9783;</span>About</button>
+</nav>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mtitle">
+  <div class="sheet">
+    <button class="x" id="mclose" aria-label="Close">&#10005;</button>
+    <div class="cardface bigcard" id="mcard"></div>
+    <div class="links">
+      <a class="btn" id="mlink" href="#" target="_blank" rel="noopener">Read the full pattern</a>
+    </div>
+    <div id="mrelated"></div>
+    <div class="pager">
+      <button class="btn small" id="mprev">&#8592; Previous</button>
+      <button class="btn small" id="mnext">Next &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= CONFIG ================= */
+const IMG_BASE = 'cards/';
+const SITE = 'https://groupworksdeck.org/patterns/';
+
+/* Each card: n = name, c = category index, s = official page slug,
+   d = original plain-language summary written for this app
+   (not the official card heart - tap through for that). */
+const CATS = [
+  {n:'Intention',  col:'#c9a44c', d:'Why the group gathers', img:'intention', cat:'intention',
+   long:'Concentrate on serving the larger purpose for the gathering and how it is enacted. Why are we here? What\u2019s our shared passion? What are we aiming to accomplish? Includes addressing the longer-term meaning and consequence of this event or series.'},
+  {n:'Context',    col:'#7a9e5f', d:'The setting and its history', img:'context', cat:'context',
+   long:'Be aware of and respect the broader context and circumstances of time, place, and culture. Grounded in this understanding, intentionally create the container for group engagement.'},
+  {n:'Relationship',col:'#c46d4e',d:'How people are with each other', img:'relationship', cat:'relationship',
+   long:'Create and maintain quality connections with each other through nurturing rapport and friendship, honouring people\u2019s full selves, and finding ways to be authentic. This sometimes requires working with power relations, or foregrounding emotional needs in the moment rather than task.'},
+  {n:'Flow',       col:'#5d8fae', d:'Rhythm, pacing, and timing', img:'flow', cat:'flow',
+   long:'Group events have a rhythm and a flow to them. Both in anticipating an event and in response to emerging circumstances, pay attention to pacing, sequencing, and the natural ebb and tide of energy and attention.'},
+  {n:'Creativity', col:'#b65d8a', d:'Imagination and play', img:'creativity', cat:'creativity',
+   long:'Activate fresh thinking and playful exploration. Engage imagination, intuition, and embodiment to generate new ideas and approaches, and to break out of habitual patterns.'},
+  {n:'Perspective',col:'#8a7fb8', d:'Shifting how things are seen', img:'perspective', cat:'perspective',
+   long:'Understand divergent ways of seeing an issue to support the group in openly and thoughtfully exploring options. Be flexible and use your imagination in considering a variety of vantage points. The key is in how you look at something.'},
+  {n:'Modelling',  col:'#4f9e8c', d:'Embodying what you ask of others', img:'modelling', cat:'modelling',
+   long:'Demonstrate, through your own presence and behaviour, the qualities and practices you hope to see in the group. What you embody often has more influence than what you say.'},
+  {n:'Inquiry & Synthesis',col:'#b08a4a',d:'Asking, gathering, distilling', img:'inquiry_and_synthesis', cat:'inquiry-synthesis',
+   long:'Discover coherence and shared meaning to move toward convergence. By gathering knowledge and teasing out the threads of common understanding, you can arrive at consensus and clear outcomes.'},
+  {n:'Faith',      col:'#9aa64f', d:'Trusting the group and the unknown', img:'faith', cat:'faith',
+   long:'Trust and accept what happens in a spirit of letting go and letting come. Invite the mystery and complex magic of emergence. This quality is felt as a deep sense of connection not only to those assembled and to the work\u2019s purpose, but to the larger universe as well.'}
+];
+
+const DECK = [
+ // Intention
+ {n:'Commitment',c:0,s:'Commitment',d:'A group moves differently when its members have genuinely signed on. Invite real pledges, not polite nods.',rel:[]},
+ {n:'Invitation',c:0,s:'Invitation',d:'How people are called in shapes everything that follows. Craft the welcome so the right people arrive ready.',rel:[]},
+ {n:'Priority Focus',c:0,s:'Priority_Focus',d:'Energy scatters easily. Choose what matters most right now and let the rest wait its turn.',rel:[]},
+ {n:'Purpose',c:0,s:'Purpose',d:'Be clear about why this group exists and why it is meeting. Purpose is the root every decision can return to.',rel:[]},
+ {n:'Setting Intention',c:0,s:'Setting_Intention',d:'Begin by naming what you hope will happen here, aloud and together. Stated hopes quietly steer the work.',rel:[]},
+ // Context
+ {n:'Aesthetics of Space',c:1,s:'Aesthetics_of_Space',d:'Beautiful, comfortable, well-arranged rooms call out people\u2019s best energy. Tend the space as part of the design.',rel:[]},
+ {n:'Circle',c:1,s:'Circle',d:'Sitting where everyone can see everyone changes how people speak and listen. The round shape is old wisdom.',rel:[]},
+ {n:'Gaia',c:1,s:'Gaia',d:'Remember the living Earth that holds every gathering. Bring nature in, or bring the group out to it.',rel:[]},
+ {n:'Group Culture',c:1,s:'Group_Culture',d:'Every group grows its own habits, jokes, and norms. Notice the culture forming and shape it with care.',rel:[]},
+ {n:'History and Context',c:1,s:'History_and_Context',d:'Groups arrive carrying their past. Honor what came before so the present work can stand on it.',rel:[]},
+ {n:'Nooks in Space and Time',c:1,s:'Nooks_in_Space_and_Time',d:'Leave corners and pauses where side conversations and quiet moments can happen. Much of the real work occurs there.',rel:[]},
+ {n:'Power of Place',c:1,s:'Power_of_Place',d:'Where you meet matters. Choose ground that supports the purpose, and let the place do some of the work.',rel:[]},
+ {n:'Whole System in the Room',c:1,s:'Whole_System_in_the_Room',d:'Invite every part of the system the issue touches. Decisions made with everyone present hold up better.',rel:[]},
+ // Relationship
+ {n:'Appreciation',c:2,s:'Appreciation',d:'Name what you value in people and in the work, out loud. Gratitude loosens groups and builds trust.',rel:[]},
+ {n:'Breaking Bread Together',c:2,s:'Breaking_Bread_Together',d:'Sharing food turns strangers into companions. Eat together and watch the conversation change.',rel:[]},
+ {n:'Celebrate',c:2,s:'Celebrate',d:'Mark milestones and wins, even small ones. Joy is fuel for the long haul.',rel:[]},
+ {n:'Good Faith Assumptions',c:2,s:'Good_Faith_Assumptions',d:'Start from the belief that others mean well. Most friction softens when motives aren\u2019t on trial.',rel:[]},
+ {n:'Honour Each Person',c:2,s:'Honour_Each_Person',d:'Treat every participant as inherently worthy of respect and voice, whatever their role or views.',rel:[]},
+ {n:'Hosting',c:2,s:'Hosting',d:'Care for people the way a good host would: anticipating needs, welcoming, helping everyone feel they belong.',rel:[]},
+ {n:'Power Shift',c:2,s:'Power_Shift',d:'Notice who holds power, and deliberately make room for those who hold less to lead and be heard.',rel:[]},
+ {n:'Shared Airtime',c:2,s:'Shared_Airtime',d:'Watch who speaks and how much. Structure the conversation so quieter voices get real room.',rel:[]},
+ {n:'Tend Relationships',c:2,s:'Tend_Relationships',d:'The connections between people are the group\u2019s real infrastructure. Maintain them on purpose, not by luck.',rel:[]},
+ {n:'Transparency',c:2,s:'Transparency',d:'Share information, reasoning, and process openly. What\u2019s hidden breeds suspicion; what\u2019s visible builds trust.',rel:[]},
+ // Flow
+ {n:'Balance Process and Content',c:3,s:'Balance_Process_and_Content',d:'Attend both to what the group is working on and to how it is working. Either alone runs aground.',rel:[]},
+ {n:'Balance Structure and Flexibility',c:3,s:'Balance_Structure_and_Flexibility',d:'Plan enough to hold the work, loosely enough to follow what actually happens.',rel:[]},
+ {n:'Closing',c:3,s:'Closing',d:'End deliberately. A clear closing gathers the threads and lets people leave whole.',rel:[]},
+ {n:'Divergence and Convergence Rhythm',c:3,s:'Divergence_and_Convergence_Rhythm',d:'Open wide to explore, then narrow to decide \u2014 and know which phase you are in.',rel:[]},
+ {n:'Follow the Energy',c:3,s:'Follow_the_Energy',d:'When the room comes alive around something, consider following it, even off the agenda.',rel:[]},
+ {n:'Iteration',c:3,s:'Iteration',d:'Return to things more than once. Understanding deepens in cycles, not single passes.',rel:[]},
+ {n:'Opening and Welcome',c:3,s:'Opening_and_Welcome',d:'How a gathering begins sets its tone. Bring people gently and deliberately into the shared space.',rel:[]},
+ {n:'Preparedness',c:3,s:'Preparedness',d:'Do the homework \u2014 logistics, materials, design \u2014 so the gathering itself can be fully present.',rel:[]},
+ {n:'Reflection-Action Cycle',c:3,s:'Reflection_Action_Cycle',d:'Alternate doing with looking at what the doing taught you. Each strengthens the other.',rel:[]},
+ {n:'Rest',c:3,s:'Rest',d:'Breaks, pauses, and downtime are not lost time. Groups think and bond in the spaces between.',rel:[]},
+ {n:'Right Size Bite',c:3,s:'Right_Size_Bite',d:'Take on chunks the group can actually chew. Overreach exhausts; right-sized work builds momentum.',rel:[]},
+ {n:'Ritual',c:3,s:'Ritual',d:'Repeated, meaningful forms \u2014 a candle, a song, a check-in \u2014 give gatherings depth and continuity.',rel:[]},
+ {n:'Seasoned Timing',c:3,s:'Seasoned_Timing',d:'There is a right moment for each move. Wait for ripeness; act when the moment opens.',rel:[]},
+ {n:'Subgroup and Whole Group',c:3,s:'Subgroup_and_Whole_Group',d:'Alternate between small groups, where everyone talks, and the whole, where it all comes together.',rel:[]},
+ {n:'Trajectory',c:3,s:'Trajectory',d:'Hold a sense of where the group has been and where it is headed \u2014 across meetings, not just within one.',rel:[]},
+ // Creativity
+ {n:'Challenge',c:4,s:'Challenge',d:'A worthy stretch wakes a group up. Pose problems slightly beyond comfortable reach.',rel:[]},
+ {n:'Expressive Arts',c:4,s:'Expressive_Arts',d:'Drawing, music, movement, and making reach places words can\u2019t. Invite other languages in.',rel:[]},
+ {n:'Generate Possibilities',c:4,s:'Generate_Possibilities',d:'Before judging options, make lots of them. Quantity first; selection later.',rel:[]},
+ {n:'Improvise',c:4,s:'Improvise',d:'When the plan meets reality, work with what is actually in the room.',rel:[]},
+ {n:'Mode Choice',c:4,s:'Mode_Choice',d:'Talking is not the only way. Match the activity \u2014 writing, moving, drawing, silence \u2014 to the need.',rel:[]},
+ {n:'Playfulness',c:4,s:'Playfulness',d:'Lightness opens minds. Games and humor are not a break from the work; often they are the work.',rel:[]},
+ {n:'Power of Constraints',c:4,s:'Power_of_Constraints',d:'Limits focus creativity. A tight frame of time, form, or resources can set a group free.',rel:[]},
+ // Perspective
+ {n:'Common Ground',c:5,s:'Common_Ground',d:'Find what everyone already shares, and build from there.',rel:[]},
+ {n:'Embrace Dissonance and Difference',c:5,s:'Embrace_Dissonance_and_Difference',d:'Disagreement is information. Welcome friction as raw material rather than smoothing it away.',rel:[]},
+ {n:'Fractal',c:5,s:'Fractal',d:'Patterns repeat at every scale \u2014 in a pair, a team, a movement. What you see small is happening large.',rel:[]},
+ {n:'Go Meta',c:5,s:'Go_Meta',d:'Step out of the conversation to look at the conversation. Naming the dynamic often shifts it.',rel:[]},
+ {n:'Seeing the Forest, Seeing the Trees',c:5,s:'Seeing_the_Forest_Seeing_the_Trees',d:'Move between the big picture and the details; both views are needed and neither is complete.',rel:[]},
+ {n:'Time Shift',c:5,s:'Time_Shift',d:'Look from another point in time \u2014 the ancestors, the future, next year. Distance reveals.',rel:[]},
+ {n:'Translation',c:5,s:'Translation',d:'Help different vocabularies, cultures, and disciplines hear each other. Meaning needs carrying across.',rel:[]},
+ {n:'Unity and Diversity',c:5,s:'Unity_and_Diversity',d:'A group can be deeply varied and deeply together at once. Hold both, sacrificing neither.',rel:[]},
+ {n:'Value the Margins',c:5,s:'Value_the_Margins',d:'The edges \u2014 newcomers, dissenters, the quiet \u2014 often carry what the center cannot see.',rel:[]},
+ {n:'Viewpoint Shift',c:5,s:'Viewpoint_Shift',d:'Try the question from someone else\u2019s seat. Standing elsewhere changes what is visible.',rel:[]},
+ // Modelling
+ {n:'Appropriate Boundaries',c:6,s:'Appropriate_Boundaries',d:'Know what is yours to carry and what is not. Clear limits protect both the work and the people.',rel:[]},
+ {n:'Courageous Modelling',c:6,s:'Courageous_Modelling',d:'Do the brave thing first \u2014 name the hard truth, show vulnerability \u2014 and others will find it possible too.',rel:[]},
+ {n:'Discharging',c:6,s:'Discharging',d:'Strong feelings need somewhere to go. Make safe room for emotion to move through and clear.',rel:[]},
+ {n:'Dwell with Emotions',c:6,s:'Dwell_with_Emotions',d:'Do not rush past feelings to fix them. Staying with what is present lets it teach.',rel:[]},
+ {n:'Guerrilla Facilitation',c:6,s:'Guerrilla_Facilitation',d:'You can serve good process from any chair. Small, well-timed moves from participants shape the whole.',rel:[]},
+ {n:'Holding Space',c:6,s:'Holding_Space',d:'Keep a steady, open container in which others can do their real work, without steering it.',rel:[]},
+ {n:'Listening',c:6,s:'Listening',d:'Full attention is rarer than advice. Listen to understand, not to answer.',rel:[]},
+ {n:'Mirroring',c:6,s:'Mirroring',d:'Reflect back what you hear and see, so people know they have landed and can hear themselves.',rel:[]},
+ {n:'Not about You',c:6,s:'Not_about_You',d:'Set your own agenda and ego aside; you are serving the group\u2019s purpose, not your performance.',rel:[]},
+ {n:'Self-Awareness',c:6,s:'Self_Awareness',d:'Know your own triggers, habits, and blind spots \u2014 they are in the room whether you notice them or not.',rel:[]},
+ {n:'Shared Leadership and Roles',c:6,s:'Shared_Leadership_and_Roles',d:'Pass roles around. When many people hold pieces of the work, the group owns it.',rel:[]},
+ {n:'Simplify',c:6,s:'Simplify',d:'Strip the design to what serves. Complexity costs attention.',rel:[]},
+ {n:'Taking Responsibility',c:6,s:'Taking_Responsibility',d:'Own your part \u2014 in successes, in mistakes, and in what happens next.',rel:[]},
+ {n:'Witness with Compassion',c:6,s:'Witness_with_Compassion',d:'Sometimes the gift is simply to see someone fully, without judging or fixing.',rel:[]},
+ // Inquiry & Synthesis
+ {n:'Deliberate',c:7,s:'Deliberate',d:'Weigh options carefully together, examining evidence and tradeoffs before choosing.',rel:[]},
+ {n:'Distilling',c:7,s:'Distilling',d:'Boil much down to little: the essence the group can hold and carry forward.',rel:[]},
+ {n:'Experts on Tap',c:7,s:'Experts_on_Tap',d:'Use specialists as a resource the group draws on \u2014 on tap, not on top.',rel:[]},
+ {n:'Feedback',c:7,s:'Feedback',d:'Offer and invite honest information about how things are landing. It is how groups learn.',rel:[]},
+ {n:'Go Deeper',c:7,s:'Go_Deeper',d:'Do not settle for the first answer. Ask again; the real material lies under the surface.',rel:[]},
+ {n:'Harvesting',c:7,s:'Harvesting',d:'Capture what the group creates \u2014 insights, decisions, stories \u2014 so it is not lost when the room empties.',rel:[]},
+ {n:'Inform the Group Mind',c:7,s:'Inform_the_Group_Mind',d:'Get the relevant knowledge to everyone, so the group thinks with a full deck.',rel:[]},
+ {n:'Inquiry',c:7,s:'Inquiry',d:'A good question outperforms a good answer. Lead with genuine curiosity.',rel:[]},
+ {n:'Mapping and Measurement',c:7,s:'Mapping_and_Measurement',d:'Make the situation visible \u2014 maps, counts, timelines \u2014 so the group can see what it is working with.',rel:[]},
+ {n:'Moving toward Alignment',c:7,s:'Moving_toward_Alignment',d:'Aim for decisions people can genuinely stand behind, building agreement step by step.',rel:[]},
+ {n:'Naming',c:7,s:'Naming',d:'Saying what is really going on \u2014 clearly, kindly \u2014 releases stuck energy.',rel:[]},
+ {n:'Story',c:7,s:'Story',d:'Stories carry meaning that bullet points cannot. Make room for people to tell theirs.',rel:[]},
+ {n:'Yes, and',c:7,s:'Yes_and',d:'Receive what is offered and build on it, rather than blocking. The improv rule works in meetings too.',rel:[]},
+ // Faith
+ {n:'All Grist for the Mill',c:8,s:'All_Grist_for_the_Mill',d:'Whatever happens \u2014 interruptions, mistakes, conflict \u2014 can feed the work. Nothing is wasted unless you waste it.',rel:[]},
+ {n:'Dive In',c:8,s:'Dive_In',d:'At some point, stop preparing and begin. Wholehearted entry creates its own readiness.',rel:[]},
+ {n:'Emergence',c:8,s:'Emergence',d:'The best outcomes often cannot be planned \u2014 they arise. Create conditions, then let what wants to happen, happen.',rel:[]},
+ {n:'Letting Go',c:8,s:'Letting_Go',d:'Release the outcome, the plan, or the grievance that is holding the group back.',rel:[]},
+ {n:'Magic',c:8,s:'Magic',d:'Sometimes a gathering becomes more than the sum of its parts. Leave room for that, and notice when it arrives.',rel:[]},
+ {n:'Presence',c:8,s:'Presence',d:'Be fully here. A grounded, attentive person changes a room without saying a word.',rel:[]},
+ {n:'Silence',c:8,s:'Silence',d:'Quiet is not empty. Shared silence lets depth, rest, and insight surface.',rel:[]},
+ {n:'Spirit',c:8,s:'Spirit',d:'Honor the dimension of meaning \u2014 however the group names it \u2014 that runs beneath the task.',rel:[]},
+ {n:'Trust the Wisdom of the Group',c:8,s:'Trust_the_Wisdom_of_the_Group',d:'Together, people know more than any one of them. Trust that, especially when it is hard.',rel:[]}
+];
+DECK.forEach((d,i)=>{ d.i=i; d.img = IMG_BASE + d.s.toLowerCase() + '.jpg'; });
+
+const SPREADS = [
+ {n:'Two: Here & Next', d:'A quick check-in: name where the group stands, then what wants to emerge.',
+  l:['Where we are','What wants to emerge']},
+ {n:'Three: Story Arc', d:'Read the spread left to right as the story of a gathering or a project.',
+  l:['How it begins','The turning point','How it lands']},
+ {n:'Four: Compass', d:'Orient a group that feels lost \u2014 what to hold, release, invite, and watch for.',
+  l:['What to hold onto','What to release','What to invite','What to watch for']},
+ {n:'Five: Meeting Design', d:'Sketch a whole session \u2014 draw a pattern to anchor each phase of the meeting.',
+  l:['Opening','The heart of the work','Where it may get hard','Harvest','Closing']},
+ {n:'Seven: Deep Dive', d:'A fuller reading for retreats and long processes.',
+  l:['Ground','Intention','Strength to draw on','Shadow to mind','Relationship thread','Wild card','Where it leads']},
+ {n:'Custom', d:'Deal any number of cards, unlabeled, and let the story tell itself.', l:null}
+];
+
+/* ================= HELPERS ================= */
+const $ = id => document.getElementById(id);
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function toast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),1800);
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+
+/* Build a full card face (name + summary on one surface).
+   If official artwork exists, it loads on top and becomes the card. */
+function fillFace(el, d){
+  if(d.isCat){
+    el.style.setProperty('--cc',d.col);
+    el.innerHTML =
+      '<span class="band"></span>'+
+      '<span class="nm">'+esc(d.n)+'</span>'+
+      '<p class="desc">'+esc(d.d)+'</p>'+
+      '<span class="ct">Category</span>';
+    const img = new Image();
+    img.className='art'; img.alt = d.n + ' category';
+    img.src = IMG_BASE + d.img + '.jpg';
+    img.onload = ()=>el.appendChild(img);
+    return;
+  }
+  const cat = CATS[d.c];
+  el.style.setProperty('--cc',cat.col);
+  el.innerHTML =
+    '<span class="band"></span>'+
+    '<span class="nm">'+esc(d.n)+'</span>'+
+    '<p class="desc">'+esc(d.d)+'</p>'+
+    '<span class="ct">'+esc(cat.n)+'</span>';
+  const img = new Image();
+  img.className='art'; img.alt = d.n + ' card';
+  img.src = d.img;
+  img.onload = ()=>el.appendChild(img);
+}
+
+/* ================= TABS ================= */
+document.querySelectorAll('nav button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+    $('v-'+b.dataset.v).classList.add('on');
+    window.scrollTo({top:0});
+  });
+});
+
+/* ================= BROWSE ================= */
+let activeCat = -1;
+const chipsEl = $('chips');
+const allChip = document.createElement('button');
+allChip.className='chip on'; allChip.textContent='All'; allChip.style.setProperty('--cc','#c9a44c');
+allChip.onclick = ()=>{activeCat=-1; syncChips(); renderGrid();};
+chipsEl.appendChild(allChip);
+CATS.forEach((c,i)=>{
+  const b=document.createElement('button');
+  b.className='chip'; b.textContent=c.n; b.style.setProperty('--cc',c.col);
+  b.onclick=()=>{activeCat = (activeCat===i ? -1 : i); syncChips(); renderGrid();};
+  b.dataset.i=i;
+  chipsEl.appendChild(b);
+});
+function syncChips(){
+  chipsEl.querySelectorAll('.chip').forEach(b=>{
+    if(!('i' in b.dataset)) b.classList.toggle('on',activeCat===-1);
+    else b.classList.toggle('on',+b.dataset.i===activeCat);
+  });
+}
+$('q').addEventListener('input',renderGrid);
+
+let sortMode = 'cat'; // 'cat' | 'alpha'
+$('sortcat').onclick = ()=>{ sortMode='cat'; $('sortcat').classList.add('on'); $('sortalpha').classList.remove('on'); renderGrid(); };
+$('sortalpha').onclick = ()=>{ sortMode='alpha'; $('sortalpha').classList.add('on'); $('sortcat').classList.remove('on'); renderGrid(); };
+
+function renderGrid(){
+  const q = $('q').value.trim().toLowerCase();
+  let list = DECK.filter(d =>
+    (activeCat===-1 || d.c===activeCat) &&
+    (!q || d.n.toLowerCase().includes(q) || d.d.toLowerCase().includes(q) || CATS[d.c].n.toLowerCase().includes(q))
+  );
+  if(sortMode==='alpha'){
+    list = list.slice().sort((a,b)=>a.n.localeCompare(b.n));
+  } else {
+    list = list.slice().sort((a,b)=> a.c-b.c || a.n.localeCompare(b.n));
+  }
+  $('count').textContent = list.length + ' patterns' +
+    (activeCat>-1 ? ' \u00b7 ' + CATS[activeCat].n : '');
+  const g=$('grid'); g.innerHTML='';
+  if(activeCat>-1 && !q){
+    const cat = CATS[activeCat];
+    const b = document.createElement('button');
+    b.className='mini cardface';
+    fillFace(b, {isCat:true, n:cat.n, d:cat.long || cat.d, col:cat.col, img:cat.img});
+    b.onclick = ()=>openCategory(activeCat);
+    g.appendChild(b);
+  }
+  const showHeaders = sortMode==='cat' && activeCat===-1 && !q;
+  let lastCat = -1;
+  list.forEach(d=>{
+    if(showHeaders && d.c!==lastCat){
+      lastCat=d.c;
+      // category divider card as first tile in each group
+      const cat = CATS[d.c];
+      const cb=document.createElement('button');
+      cb.className='mini cardface';
+      fillFace(cb, {isCat:true, n:cat.n, d:cat.long || cat.d, col:cat.col, img:cat.img});
+      cb.onclick=()=>openCategory(d.c);
+      g.appendChild(cb);
+    }
+    const b=document.createElement('button');
+    b.className='mini cardface';
+    fillFace(b, d);
+    b.onclick=()=>openCard(d.i);
+    g.appendChild(b);
+  });
+  if(!list.length){
+    g.innerHTML='<p style="grid-column:1/-1;color:#9db8a6;font-size:14px;padding:20px 4px">No patterns match \u2014 try a shorter search.</p>';
+  }
+}
+renderGrid();
+
+/* ================= DETAIL MODAL ================= */
+const NAME_LOOKUP = {};
+DECK.forEach(d=>{ NAME_LOOKUP[d.n.toLowerCase()] = d.i; });
+
+let modalIdx = 0, modalList = null, modalIsCat = false;
+function openCard(i, list){
+  modalIdx = i; modalList = list || null; modalIsCat = false;
+  const d = DECK[i];
+  fillFace($('mcard'), d);
+  $('mlink').href = SITE + d.s;
+  $('mlink').textContent = 'Read the full pattern';
+  $('mlink').style.display = '';
+  document.querySelector('.pager').style.display = '';
+  const relWrap = $('mrelated');
+  if(d.rel && d.rel.length){
+    relWrap.innerHTML = '<div class="relwrap"><h3>Related patterns</h3><div class="relchips"></div></div>';
+    const chips = relWrap.querySelector('.relchips');
+    d.rel.forEach(name=>{
+      const idx = NAME_LOOKUP[name.toLowerCase()];
+      if(idx===undefined) return;
+      const rd = DECK[idx];
+      const c=document.createElement('button');
+      c.className='relchip'; c.textContent=rd.n;
+      c.style.setProperty('--cc',CATS[rd.c].col);
+      c.onclick=()=>openCard(idx);
+      chips.appendChild(c);
+    });
+  } else {
+    relWrap.innerHTML='';
+  }
+  $('modal').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function openCategory(i){
+  modalIdx = i; modalList = null; modalIsCat = true;
+  const cat = CATS[i];
+  fillFace($('mcard'), {isCat:true, n:cat.n, d:cat.long || cat.d, col:cat.col, img:cat.img});
+  $('mlink').href = 'https://groupworksdeck.org/category/' + cat.cat;
+  $('mlink').textContent = 'View this category on groupworksdeck.org';
+  $('mlink').style.display = '';
+  $('mrelated').innerHTML = '';
+  document.querySelector('.pager').style.display = 'none';
+  $('modal').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  $('modal').classList.remove('on');
+  document.body.style.overflow='';
+}
+$('mclose').onclick = closeModal;
+$('modal').addEventListener('click',e=>{ if(e.target===$('modal')) closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+function step(dir){
+  if(modalIsCat) return;
+  const list = modalList || DECK.map(d=>d.i);
+  const pos = list.indexOf(modalIdx);
+  const next = list[(pos + dir + list.length) % list.length];
+  openCard(next, modalList);
+}
+$('mprev').onclick = ()=>step(-1);
+$('mnext').onclick = ()=>step(1);
+
+/* ================= DRAW ================= */
+let drawn = null;
+const drawFlip = $('drawflip');
+function doDraw(){
+  const cat = +$('drawcat').value;
+  const pool = DECK.filter(d=>cat===-1 || d.c===cat);
+  drawn = pool[Math.floor(Math.random()*pool.length)];
+  drawFlip.classList.remove('flipped');
+  setTimeout(()=>{
+    fillFace($('drawfront'), drawn);
+    drawFlip.classList.add('flipped');
+  }, drawFlip.classList.contains('flipped') ? 320 : 60);
+  $('drawhint').textContent = 'Sit with it a moment \u2014 tap the card to enlarge.';
+  $('drawopen').hidden = false;
+  $('drawbtn').textContent = 'Draw again';
+}
+$('drawbtn').onclick = doDraw;
+drawFlip.onclick = ()=>{ drawn ? openCard(drawn.i) : doDraw(); };
+drawFlip.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); drawFlip.click();} });
+$('drawopen').onclick = ()=>{ if(drawn) window.open(SITE + drawn.s, '_blank'); };
+CATS.forEach((c,i)=>{
+  const o=document.createElement('option'); o.value=i; o.textContent=c.n;
+  $('drawcat').appendChild(o);
+});
+
+/* ================= SPREADS ================= */
+let spreadIdx = 1;
+let dealt = [];
+const bar = $('spreadbar');
+SPREADS.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.className='chip'+(i===spreadIdx?' on':''); b.style.setProperty('--cc','#c9a44c');
+  b.textContent = s.n;
+  b.onclick = ()=>{
+    spreadIdx=i;
+    bar.querySelectorAll('.chip').forEach((x,j)=>x.classList.toggle('on',j===i));
+    $('customrow').hidden = s.l !== null;
+    $('spreaddesc').textContent = s.d;
+    deal();
+  };
+  bar.appendChild(b);
+});
+for(let n=2;n<=13;n++){
+  const o=document.createElement('option'); o.value=n; o.textContent=n+' cards';
+  if(n===5) o.selected=true;
+  $('customn').appendChild(o);
+}
+$('customn').onchange = deal;
+$('spreaddesc').textContent = SPREADS[spreadIdx].d;
+
+function deal(){
+  const s = SPREADS[spreadIdx];
+  const n = s.l ? s.l.length : +$('customn').value;
+  const cards = shuffle(DECK.slice()).slice(0,n);
+  dealt = cards.map((c,k)=>({card:c, label: s.l ? s.l[k] : 'Card '+(k+1), flipped:false}));
+  renderTable();
+}
+function renderTable(){
+  const t=$('table'); t.innerHTML='';
+  dealt.forEach((slot)=>{
+    const wrap=document.createElement('div'); wrap.className='slot';
+    const lab=document.createElement('div'); lab.className='lab'; lab.textContent=slot.label;
+    const flip=document.createElement('div');
+    flip.className='flip'+(slot.flipped?' flipped':'');
+    flip.setAttribute('role','button'); flip.tabIndex=0;
+    flip.setAttribute('aria-label', slot.label + (slot.flipped ? ': ' + slot.card.n : ' \u2014 tap to reveal'));
+    flip.innerHTML='<div class="inner"><div class="face back"><div class="mark">GW</div></div></div>';
+    const front=document.createElement('div'); front.className='face front cardface';
+    if(slot.flipped) fillFace(front, slot.card);
+    flip.querySelector('.inner').appendChild(front);
+    flip.onclick=()=>{
+      if(!slot.flipped){
+        slot.flipped=true;
+        fillFace(front, slot.card);
+        flip.classList.add('flipped');
+        flip.setAttribute('aria-label', slot.label + ': ' + slot.card.n);
+      } else {
+        openCard(slot.card.i, dealt.map(x=>x.card.i));
+      }
+    };
+    flip.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); flip.click();} });
+    const redo=document.createElement('button');
+    redo.className='redo'; redo.textContent='\u21bb redraw';
+    redo.onclick=()=>{
+      const used = new Set(dealt.map(x=>x.card.i));
+      const pool = DECK.filter(d=>!used.has(d.i));
+      slot.card = pool[Math.floor(Math.random()*pool.length)];
+      slot.flipped = true;
+      renderTable();
+    };
+    wrap.append(lab, flip, redo);
+    t.appendChild(wrap);
+  });
+}
+$('dealbtn').onclick = deal;
+$('flipall').onclick = ()=>{ dealt.forEach(s=>s.flipped=true); renderTable(); };
+$('copyspread').onclick = ()=>{
+  if(!dealt.length){ toast('Deal a spread first'); return; }
+  const s = SPREADS[spreadIdx];
+  const lines = ['Group Works spread \u2014 ' + s.n + ' \u2014 ' + new Date().toLocaleDateString()];
+  dealt.forEach(x=>lines.push('\u2022 ' + x.label + ': ' + (x.flipped ? x.card.n + ' (' + CATS[x.card.c].n + ')' : '(unrevealed)')));
+  lines.push('Patterns: https://groupworksdeck.org/patterns');
+  const txt = lines.join('\n');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast('Spread copied'),()=>toast('Copy not available'));
+  } else toast('Copy not available');
+};
+deal();
+</script>
+</body>
+</html>
